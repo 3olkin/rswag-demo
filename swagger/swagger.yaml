@@ -1,0 +1,198 @@
+---
+openapi: 3.0.1
+info:
+  title: API
+paths:
+  "/login":
+    post:
+      summary: authenticate user with credentials
+      parameters: []
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+        '401':
+          description: wrong credentials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+              - email
+              - password
+  "/register":
+    post:
+      summary: register new user
+      parameters: []
+      responses:
+        '201':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    "$ref": "#/components/schemas/user"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                password_confirmation:
+                  type: string
+              required:
+              - name
+              - email
+              - password
+              - password_confirmation
+  "/messages":
+    get:
+      summary: list messages
+      security:
+      - {}
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      "$ref": "#/components/schemas/message"
+    post:
+      summary: create message
+      parameters: []
+      security:
+      - bearer_auth: []
+      responses:
+        '201':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    "$ref": "#/components/schemas/message"
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                body:
+                  type: string
+              required:
+              - title
+  "/messages/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    put:
+      summary: update message
+      parameters: []
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                body:
+                  type: string
+    delete:
+      summary: delete message
+      security:
+      - bearer_auth: []
+      responses:
+        '204':
+          description: successful
+        '401':
+          description: unauthorized
+  "/users/whoami":
+    get:
+      summary: retrieve current user from jwt
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    "$ref": "#/components/schemas/user"
+        '401':
+          description: unauthorized
+servers:
+- url: "{baseUrl}"
+  variables:
+    baseUrl:
+      default: http://localhost:3000
+components:
+  schemas:
+    message:
+      type: object
+      properties:
+        title:
+          type: string
+        body:
+          type: string
+        user_id:
+          type: integer
+    user:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+  securitySchemes:
+    bearer_auth:
+      type: http
+      scheme: bearer
+      bearer_format: JWT

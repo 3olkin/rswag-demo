@@ -1,13 +1,18 @@
 Rails.application.routes.draw do
-  resources :messages
-  resources :users, only: [] do
-    collection do
-      get :whoami
-    end
-  end
+  mount Rswag::Ui::Engine => '/api-docs'
+  mount Rswag::Api::Engine => '/api-docs'
 
-  controller :auth do
-    post :login
-    post :register
+  constraints format: :json do
+    resources :messages
+    resources :users, only: [] do
+      collection do
+        get :whoami
+      end
+    end
+
+    controller :auth do
+      post :login
+      post :register
+    end
   end
 end
