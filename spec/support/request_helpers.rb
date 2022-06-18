@@ -4,8 +4,6 @@ module RequestHelpers
   end
 
   def access_token_for(user)
-    return unless user.is_a? User
-
     "Bearer #{JsonWebToken.encode(sub: user.id)}"
   end
 end

@@ -11,6 +11,11 @@ class MessagesController < ApplicationController
     render_json message, status: :created
   end
 
+  def update
+    message.update!(message_params)
+    render_json message
+  end
+
   def destroy
     message.destroy
     head(:no_content)
